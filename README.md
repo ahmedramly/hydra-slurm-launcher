@@ -22,7 +22,7 @@ pip install git+https://github.com/ahmedramly/hydra-slurm-launcher.git
 ## Requirements
 
 - Python >= 3.6
-- hydra-core >= 1.0.0
+- hydra-core >= 1.3.0
 - Access to a SLURM cluster
 
 ## Usage
@@ -30,6 +30,23 @@ pip install git+https://github.com/ahmedramly/hydra-slurm-launcher.git
 ### Basic Configuration
 
 Add the SLURM launcher to your Hydra configuration:
+
+```yaml
+# hydra/launcher/slurm.yaml
+# SLURM launcher configuration
+_target_: hydra_plugins.hydra_slurm_launcher.slurm_launcher.SlurmLauncher
+job_name: null
+job_array_name: null
+partition: your_partition                  
+nodes: 1
+ntasks_per_node: 1
+cpus_per_task: 16
+time: "3:00:00"                          
+mem: 64G 
+
+setup: 
+  - conda activate my_env
+```
 
 ```yaml
 # config.yaml
@@ -41,12 +58,17 @@ defaults:
 param1: value1
 param2: value2
 
-launcher:
-  partition: gpu
-  time: "01:00:00"
-  cpus_per_task: 4
-  mem: "16G"
-  gpus: 1
+hydra:
+  launcher: # if you need to override anything in the launcher can be done here also
+    job_name: null
+    job_array_name: null
+  job:
+    name: my_job # need to specified 
+  run:
+    dir: my_run_dir # need to specified
+  sweep:
+    dir: sweep_dir # need to specified (can be experiment name)
+    subdir: ubdir # need to specified (can be run name)
 ```
 
 ### Running a Sweep
@@ -54,6 +76,8 @@ launcher:
 ```bash
 python your_script.py -m param1=1,2,3 param2=a,b,c
 ```
+
+> **Important**: The SLURM launcher requires the `-m` or `--multirun` flag to be present, even for single jobs without parameter overrides. For a single job, use: `python your_script.py -m`
 
 ### Advanced Configuration
 
@@ -172,6 +196,26 @@ launcher:
 
 Job arrays are more efficient for large parameter sweeps and reduce scheduler overhead.
 
+## Output Files
+
+The launcher automatically creates organized log files:
+
+**Individual Jobs:**
+```
+<output_dir>/
+├── <job_name>_<slurm_job_id>.out/.err    # stdout/stderr
+└── <job_name>.sh                         # SLURM script
+```
+
+**Job Arrays:**
+```
+<sweep_dir>/
+├── <array_name>_array.sh                 # Main script
+├── <array_name>_array_config.json        # Task configs
+└── <task_dirs>/
+    └── <job_name>_<array_job_id>_<task_id>.out/.err
+```
+
 ## Examples
 
 ### Machine Learning Training
@@ -179,37 +223,16 @@ Job arrays are more efficient for large parameter sweeps and reduce scheduler ov
 ```yaml
 # config.yaml
 defaults:
-  - launcher: slurm
+  - override hydra/launcher: slurm
 
 model:
   lr: 0.001
   batch_size: 32
 
-launcher:
-  partition: gpu
-  time: "04:00:00"
-  cpus_per_task: 8
-  mem: "32G"
-  gpus: 1
-  setup:
-    - "module load cuda/11.2"
-    - "source activate ml_env"
 ```
 
 ```bash
 python train.py -m model.lr=0.001,0.01,0.1 model.batch_size=32,64,128
 ```
 
-### Data Processing Pipeline
-
-```yaml
-launcher:
-  partition: cpu
-  time: "01:00:00"
-  cpus_per_task: 16
-  mem: "64G"
-  job_array_name: data_processing
-  setup:
-    - "module load python/3.9"
-```
 
