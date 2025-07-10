@@ -16,16 +16,8 @@ A custom Hydra launcher plugin that submits jobs to a SLURM cluster using `sbatc
 ### From Source
 
 ```bash
-git clone <repository-url>
-cd hydra-slurm-launcher
-pip install -e .
+pip install git+https://github.com/ahmedramly/hydra-slurm-launcher.git
 ```
-
-<!-- ### Using pip (if published)
-
-```bash
-pip install hydra-slurm-launcher
-``` -->
 
 ## Requirements
 
@@ -221,13 +213,3 @@ launcher:
     - "module load python/3.9"
 ```
 
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-
-## Acknowledgments
-
-- Built on top of [Hydra](https://hydra.cc/) by Facebook Research
-- Inspired by the need for seamless HPC integration with modern ML workflows
