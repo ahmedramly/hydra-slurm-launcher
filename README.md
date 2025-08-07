@@ -1,6 +1,6 @@
 # Hydra SLURM Launcher
 
-A custom Hydra launcher plugin that submits jobs to a SLURM cluster using `sbatch`. This plugin extends Hydra's multirun capabilities to seamlessly work with SLURM workload managers, allowing you to run parameter sweeps and parallel jobs on HPC clusters without terminal blocking.
+A custom Hydra launcher plugin that submits jobs to a SLURM cluster using `sbatch`. Hydra's Basic Launcher is great when submitting single jobs to a slurm cluster but when submitting multiple jobs with overrides, it runs the jobs sequentially not in parallel as we would wish. This is a work around for this where you can have as many overrides as your application needs and the launcer will submit a single job/task for each override combination using the Basic Launcher. This plugin extends Hydra's multirun capabilities to seamlessly work with SLURM workload managers, allowing you to run parameter sweeps and parallel jobs on HPC clusters without terminal blocking.
 
 ## Features
 

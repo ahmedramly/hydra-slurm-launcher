@@ -8,10 +8,10 @@ from hydra.core.utils import (
     setup_globals,
     configure_log,
 )
+from hydra_plugins.hydra_slurm_launcher._core import submit_job_array
 from omegaconf import DictConfig, OmegaConf
 from typing import Any, List, Optional
 from .config import SlurmQueueConf
-from ._core import submit_job, submit_job_array
 
 
 log = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ class SlurmLauncher(Launcher):
     def launch(
         self, job_overrides: List[List[str]], initial_job_idx: int
     ) -> List[JobReturn]:
+                
         setup_globals()
         assert self.hydra_context is not None
         assert self.config is not None
@@ -73,6 +74,9 @@ class SlurmLauncher(Launcher):
         sweep_dir: Path,
     ) -> List[JobReturn]:
         """Launch jobs as a single SLURM job array"""
+        
+        from ._core import submit_job_array
+        
         log.info(
             f"Submitting {len(job_overrides)} jobs to SLURM as a job array"
         )
@@ -118,6 +122,9 @@ class SlurmLauncher(Launcher):
         sweep_dir: Path,
     ) -> List[JobReturn]:
         """Launch jobs individually"""
+        
+        from ._core import submit_job
+        
         log.info(f"Submitting {len(job_overrides)} jobs to SLURM individually")
         returns: List[JobReturn] = []
 
